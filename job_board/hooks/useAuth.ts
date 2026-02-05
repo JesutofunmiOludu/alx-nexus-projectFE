@@ -72,9 +72,6 @@ export function useAuth() {
     queryFn: () => authService.getCurrentUser(),
     enabled: isAuthenticated,
     retry: false,
-    onSuccess: (data) => {
-      dispatch(setUser(data));
-    },
   });
 
   return {
@@ -82,8 +79,8 @@ export function useAuth() {
     isAuthenticated,
     isLoading: isLoading || loginMutation.isPending || registerMutation.isPending,
     error,
-    login: loginMutation.mutate,
-    register: registerMutation.mutate,
+    login: (credentials: LoginCredentials, options?: any) => loginMutation.mutate(credentials, options),
+    register: (data: RegisterData, options?: any) => registerMutation.mutate(data, options),
     logout: logoutMutation.mutate,
     refetchUser,
   };
