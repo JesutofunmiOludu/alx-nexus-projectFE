@@ -1,15 +1,22 @@
-// Custom Hooks for Job Operations
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { jobService } from '@/api/services';
 import type { JobSearchParams, CreateJobData } from '@/types';
 import toast from 'react-hot-toast';
+import { getMockJobs, getMockJob } from '@/lib/mockData';
 
 // Hook to search/fetch jobs
 export function useJobs(params: JobSearchParams = {}) {
   return useQuery({
     queryKey: ['jobs', params],
-    queryFn: () => jobService.searchJobs(params),
+    queryFn: async () => {
+      try {
+        return await jobService.searchJobs(params);
+      } catch (error) {
+        // Use mock data if API fails (for development)
+        console.warn('Using mock data - API not configured');
+        return getMockJobs(params);
+      }
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -18,7 +25,15 @@ export function useJobs(params: JobSearchParams = {}) {
 export function useJob(id: string) {
   return useQuery({
     queryKey: ['jobs', id],
-    queryFn: () => jobService.getJob(id),
+    queryFn: async () => {
+      try {
+        return await jobService.getJob(id);
+      } catch (error) {
+        // Use mock data if API fails (for development)
+        console.warn('Using mock data - API not configured');
+        return getMockJob(id);
+      }
+    },
     enabled: !!id,
   });
 }

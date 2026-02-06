@@ -19,9 +19,10 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
+  const { returnUrl } = router.query;
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [showPassword, setShowPassword] = useState(false);
+  const { login, isLoading } = useAuth();
 
   const {
     register,
@@ -34,7 +35,9 @@ export default function LoginPage() {
   const onSubmit = (data: LoginFormData) => {
     login(data, {
       onSuccess: () => {
-        router.push('/jobs');
+        // Redirect to return URL or default to jobs page
+        const destination = typeof returnUrl === 'string' ? returnUrl : '/jobs';
+        router.push(destination);
       },
     });
   };

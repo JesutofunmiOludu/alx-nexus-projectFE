@@ -12,11 +12,30 @@ interface AuthState {
   error: string | null;
 }
 
+const getInitialAuth = () => {
+  if (typeof window !== 'undefined') {
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    return {
+      accessToken,
+      refreshToken,
+      isAuthenticated: !!accessToken,
+    };
+  }
+  return {
+    accessToken: null,
+    refreshToken: null,
+    isAuthenticated: false,
+  };
+};
+
+const initialAuth = getInitialAuth();
+
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
-  refreshToken: null,
-  isAuthenticated: false,
+  accessToken: initialAuth.accessToken,
+  refreshToken: initialAuth.refreshToken,
+  isAuthenticated: initialAuth.isAuthenticated,
   isLoading: false,
   error: null,
 };
@@ -33,6 +52,7 @@ const authSlice = createSlice({
       state.accessToken = action.payload.tokens.access;
       state.refreshToken = action.payload.tokens.refresh;
       state.isAuthenticated = true;
+      state.isLoading = false;
       state.error = null;
 
       // Store tokens in localStorage

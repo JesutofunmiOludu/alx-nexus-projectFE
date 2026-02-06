@@ -1,5 +1,6 @@
 // Custom Hook for Authentication
 
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { setCredentials, setUser, setLoading, setError, logout as logoutAction } from '@/store/slices/auth-slice';
@@ -67,12 +68,26 @@ export function useAuth() {
   });
 
   // Get current user query
-  const { data: currentUser, refetch: refetchUser } = useQuery({
+  const { data: currentUser, refetch: refetchUser, isError: isUserError } = useQuery({
     queryKey: ['user', 'current'],
     queryFn: () => authService.getCurrentUser(),
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !user,
     retry: false,
   });
+
+  // Sync current user to Redux
+  useEffect(() => {
+    if (currentUser) {
+      dispatch(setUser(currentUser));
+    }
+  }, [currentUser, dispatch]);
+
+  // Handle user fetch error
+  useEffect(() => {
+    if (isUserError && isAuthenticated) {
+      dispatch(logoutAction());
+    }
+  }, [isUserError, isAuthenticated, dispatch]);
 
   return {
     user,
