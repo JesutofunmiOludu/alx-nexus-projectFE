@@ -1,10 +1,10 @@
-// Custom Hook for Authentication
+// Custom Hook for Authentication 
 
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { setCredentials, setUser, setLoading, setError, logout as logoutAction } from '@/store/slices/auth-slice';
-import { authService } from '@/api/services';
+import { authService } from '@/api/api-services';
 import type { LoginCredentials, RegisterData } from '@/types';
 import toast from 'react-hot-toast';
 

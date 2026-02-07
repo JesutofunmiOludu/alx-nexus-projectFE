@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { jobService } from '@/api/services';
+import { jobService } from '@/api/api-services';
 import type { JobSearchParams, CreateJobData } from '@/types';
 import toast from 'react-hot-toast';
 import { getMockJobs, getMockJob } from '@/lib/mockData';

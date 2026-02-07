@@ -27,6 +27,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -34,9 +35,15 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
-      onSuccess: () => {
-        // Redirect to return URL or default to jobs page
-        const destination = typeof returnUrl === 'string' ? returnUrl : '/jobs';
+      onSuccess: (response) => {
+        // Determine destination based on user type or returnUrl
+        if (typeof returnUrl === 'string') {
+          router.push(returnUrl);
+          return;
+        }
+
+        const isEmployer = response.user.user_type === 'employer';
+        const destination = isEmployer ? '/employer/dashboard' : '/dashboard';
         router.push(destination);
       },
     });
@@ -188,6 +195,33 @@ export default function LoginPage() {
               {!errors.password && (
                 <p className="mt-1 text-xs text-gray-500">Password must be at least 8 characters.</p>
               )}
+            </div>
+
+            {/* Dev Mode Helpers - Remove in production */}
+            <div className="p-4 bg-gray-100 rounded-lg border border-gray-200 mt-4">
+              <p className="text-xs font-bold text-gray-500 uppercase mb-2">Dev Mode: Quick Login</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue('email', 'freelancer@example.com');
+                    setValue('password', 'password123');
+                  }}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded text-xs text-gray-700 hover:bg-gray-50 font-medium"
+                >
+                  Fill Freelancer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                     setValue('email', 'employer@techcorp.com');
+                     setValue('password', 'password123');
+                  }}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded text-xs text-gray-700 hover:bg-gray-50 font-medium"
+                >
+                  Fill Employer
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}

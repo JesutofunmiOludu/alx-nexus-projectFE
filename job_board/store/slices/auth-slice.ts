@@ -12,31 +12,12 @@ interface AuthState {
   error: string | null;
 }
 
-const getInitialAuth = () => {
-  if (typeof window !== 'undefined') {
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
-    return {
-      accessToken,
-      refreshToken,
-      isAuthenticated: !!accessToken,
-    };
-  }
-  return {
-    accessToken: null,
-    refreshToken: null,
-    isAuthenticated: false,
-  };
-};
-
-const initialAuth = getInitialAuth();
-
 const initialState: AuthState = {
   user: null,
-  accessToken: initialAuth.accessToken,
-  refreshToken: initialAuth.refreshToken,
-  isAuthenticated: initialAuth.isAuthenticated,
-  isLoading: false,
+  accessToken: null,
+  refreshToken: null,
+  isAuthenticated: false,
+  isLoading: true, // Start loading to prevent flash of content before auth check
   error: null,
 };
 
@@ -94,6 +75,19 @@ const authSlice = createSlice({
         localStorage.setItem('refreshToken', action.payload.refresh);
       }
     },
+    initializeAuth: (state) => {
+      if (typeof window !== 'undefined') {
+        const accessToken = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
+        
+        if (accessToken) {
+          state.accessToken = accessToken;
+          state.refreshToken = refreshToken;
+          state.isAuthenticated = true;
+        }
+      }
+      state.isLoading = false;
+    }
   },
 });
 
@@ -104,6 +98,7 @@ export const {
   setError,
   logout,
   updateTokens,
+  initializeAuth,
 } = authSlice.actions;
 
 export default authSlice.reducer;

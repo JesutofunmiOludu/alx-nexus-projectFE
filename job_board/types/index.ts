@@ -123,7 +123,7 @@ export interface Application {
   freelancer: User;
   cover_letter: string;
   resume?: string;
-  status: 'pending' | 'reviewing' | 'accepted' | 'rejected';
+  status: 'pending' | 'reviewing' | 'interviewing' | 'offer' | 'rejected' | 'accepted';
   applied_at: string;
   updated_at: string;
 }
@@ -135,7 +135,7 @@ export interface CreateApplicationData {
 }
 
 export interface ApplicationStatusUpdate {
-  status: 'pending' | 'reviewing' | 'accepted' | 'rejected';
+  status: 'pending' | 'reviewing' | 'interviewing' | 'offer' | 'rejected' | 'accepted';
 }
 
 // ============================================
@@ -145,10 +145,15 @@ export interface ApplicationStatusUpdate {
 export interface FreelancerProfile {
   id: string;
   user: User;
+  title?: string;
   bio?: string;
+  location?: string;
   skills: string[];
   hourly_rate?: number;
+  expected_salary?: number;
+  experience_level?: 'entry' | 'mid' | 'senior' | 'lead';
   availability: 'available' | 'busy' | 'not_available';
+  verification_status?: 'verified' | 'active' | 'none';
   portfolio_url?: string;
   github_url?: string;
   linkedin_url?: string;

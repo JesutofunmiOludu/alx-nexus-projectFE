@@ -185,3 +185,89 @@ export function getMockJobs(params: any = {}): PaginatedResponse<Job> {
 export function getMockJob(id: string): Job | null {
   return mockJobs.find((job) => job.id === id) || null;
 }
+
+// Mock Applications
+import { Application, User } from '@/types';
+
+const mockUser: User = {
+  id: 'mock-user-id',
+  email: 'alex@example.com',
+  first_name: 'Alex',
+  last_name: 'Rivera',
+  user_type: 'freelancer',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
+export const mockApplications: Application[] = [
+  {
+    id: '1',
+    job: mockJobs[3], // DevOps Engineer
+    freelancer: mockUser,
+    cover_letter: 'I am excited to apply...',
+    status: 'offer',
+    applied_at: '2023-10-20T10:00:00Z',
+    updated_at: '2023-10-25T14:30:00Z',
+  },
+  {
+    id: '2',
+    job: mockJobs[0], // Senior Frontend Engineer
+    freelancer: mockUser,
+    cover_letter: 'Here is my application...',
+    status: 'interviewing',
+    applied_at: '2023-10-22T09:15:00Z',
+    updated_at: '2023-10-24T11:20:00Z',
+  },
+  {
+    id: '3',
+    job: mockJobs[2], // UI/UX Designer
+    freelancer: mockUser,
+    cover_letter: 'Design is my passion...',
+    status: 'reviewing',
+    applied_at: '2023-10-24T16:45:00Z',
+    updated_at: '2023-10-24T16:45:00Z',
+  },
+  {
+    id: '4',
+    job: mockJobs[1], // Python Backend
+    freelancer: mockUser,
+    cover_letter: 'Experienced with Django...',
+    status: 'rejected',
+    applied_at: '2023-10-18T13:00:00Z',
+    updated_at: '2023-10-21T09:30:00Z',
+  },
+  {
+    id: '5',
+    job: mockJobs[5], // Mobile Developer
+    freelancer: mockUser,
+    cover_letter: 'React Native expert...',
+    status: 'reviewing',
+    applied_at: '2023-10-15T08:30:00Z',
+    updated_at: '2023-10-16T10:00:00Z',
+  },
+];
+
+export function getMockApplications(params: any = {}): PaginatedResponse<Application> {
+  let filteredApps = [...mockApplications];
+
+  // Filter by status
+  if (params.status) {
+    filteredApps = filteredApps.filter((app) => app.status === params.status);
+  }
+  
+  // Search filter (mock implementation)
+  if (params.q) {
+     const q = params.q.toLowerCase();
+     filteredApps = filteredApps.filter(app => 
+       app.job.title.toLowerCase().includes(q) || 
+       app.job.company.name.toLowerCase().includes(q)
+     );
+  }
+
+  return {
+    count: filteredApps.length,
+    next: null,
+    previous: null,
+    results: filteredApps,
+  };
+}

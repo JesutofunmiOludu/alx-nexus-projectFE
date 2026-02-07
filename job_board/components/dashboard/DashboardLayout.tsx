@@ -16,7 +16,9 @@ import {
   Bell,
   Search,
   Menu,
-  X
+  X,
+  Users,
+  CreditCard
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -36,6 +38,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Messages', href: '/messages', icon: MessageSquare, badge: 3 },
     { name: 'Profile Settings', href: '/profile', icon: Settings },
   ];
+
+  const employerNavigation = [
+    { name: 'Dashboard', href: '/employer/dashboard', icon: LayoutDashboard },
+    { name: 'My Jobs', href: '/employer/jobs', icon: Briefcase },
+    { name: 'Candidates', href: '/employer/candidates', icon: Users },
+    { name: 'Company Profile', href: '/employer/profile', icon: Settings }, // Using Settings icon for now as Company Profile
+    { name: 'Billing', href: '/employer/billing', icon: CreditCard },
+  ];
+
+  // Determine which navigation to use
+  const currentNavigation = user?.user_type === 'employer' ? employerNavigation : navigation;
 
   const handleLogout = () => {
     logout();
@@ -75,7 +88,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-1">
-            {navigation.map((item) => {
+            {currentNavigation.map((item) => {
               const isActive = router.pathname === item.href;
               const Icon = item.icon;
               return (
@@ -92,8 +105,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-gray-400'}`} />
                     {item.name}
                   </div>
+                  {/* @ts-ignore - badge property exists in freelancer navigation */}
                   {item.badge && (
                     <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {/* @ts-ignore */}
                       {item.badge}
                     </span>
                   )}
@@ -121,7 +136,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   {user ? `${user.first_name} ${user.last_name}` : 'User'}
                 </p>
                 <p className="text-xs text-gray-400 truncate">
-                  {user?.user_type === 'freelancer' ? 'Full-stack Dev' : 'Employer'}
+                  {user?.user_type === 'freelancer' ? 'Full-stack Dev' : 'Employer Portal'}
                 </p>
               </div>
             </div>
@@ -150,13 +165,23 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <Link
-              href="/jobs"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Find New Jobs
-            </Link>
+            {user?.user_type === 'employer' ? (
+              <Link
+                href="/employer/jobs/new"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+              >
+                <div className="mr-2 text-xl font-bold leading-none">+</div>
+                Post New Job
+              </Link>
+            ) : (
+              <Link
+                href="/jobs"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center"
+              >
+                <Search className="w-4 h-4 mr-2" />
+                Find New Jobs
+              </Link>
+            )}
           </div>
         </header>
 
