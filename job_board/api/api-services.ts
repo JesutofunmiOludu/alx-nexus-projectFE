@@ -16,6 +16,8 @@ import type {
   Company,
   CreateCompanyData,
   PaginatedResponse,
+  AnalyticsData,
+  AppNotification,
 } from '@/types';
 
 // ============================================
@@ -505,7 +507,7 @@ export class ProfileService {
             user: { id: 'u1', email: 'alex@example.com', first_name: 'Alex', last_name: 'Rivers', user_type: 'freelancer', created_at: '', updated_at: '' },
             title: 'Senior Frontend Engineer',
             location: 'San Francisco, CA',
-            verification_status: 'available',
+            verification_status: 'none',
             bio: '8+ years of experience building scalable web applications. Expert in modern React ecosystem and performance optimization.',
             skills: ['REACT', 'TYPESCRIPT', 'TAILWIND', 'NEXT.JS', 'GRAPHQL'],
             hourly_rate: 90,
@@ -553,7 +555,7 @@ export class ProfileService {
             user: { id: 'u4', email: 'elena@example.com', first_name: 'Elena', last_name: 'Rodriguez', user_type: 'freelancer', created_at: '', updated_at: '' },
             title: 'Growth Marketing Lead',
             location: 'Austin, TX',
-            verification_status: 'available',
+            verification_status: 'none',
             bio: 'Driving user acquisition through data-driven experiments. Reduced CAC by 40% for last startup while scaling 3x.',
             skills: ['SEO', 'ANALYTICS', 'PPC', 'CONTENT STRATEGY'],
             hourly_rate: 85,
@@ -598,6 +600,120 @@ export class ProfileService {
            }
         ]
       };
+    }
+  }
+}
+
+// ============================================
+// Analytics Service
+// ============================================
+
+export class AnalyticsService {
+  async getEmployerAnalytics(): Promise<AnalyticsData> {
+    try {
+      return await rapidAPIClient.get('/analytics/employer/');
+    } catch (error) {
+      console.warn('API getEmployerAnalytics failed, using mock data');
+      return {
+        summary: {
+          total_job_views: { value: 12405, change: 12, trend: 'up' },
+          applications_received: { value: 842, change: 5.2, trend: 'up' },
+          conversion_rate: { value: 6.8, change: -1.1, trend: 'down' },
+          avg_time_to_hire: { value: 18.5, change: -2, trend: 'up' }, // trend up means improvement (less days)
+        },
+        chart_data: [
+          { date: 'Oct 01', views: 2100, applications: 120 },
+          { date: 'Oct 07', views: 4800, applications: 280 },
+          { date: 'Oct 14', views: 3200, applications: 190 },
+          { date: 'Oct 21', views: 5600, applications: 340 },
+          { date: 'Oct 28', views: 8200, applications: 450 },
+          { date: 'Oct 31', views: 6100, applications: 310 },
+        ],
+        category_data: [
+          { category: 'ENG', count: 420 },
+          { category: 'SALES', count: 180 },
+          { category: 'MKTG', count: 120 },
+          { category: 'DESIGN', count: 90 },
+          { category: 'HR', count: 32 },
+        ],
+        top_jobs: [
+          { id: '1', title: 'Senior Frontend Engineer', department: 'ENGINEERING', views: 4201, applications: 412, conversion_rate: 9.8, trend: 'up' },
+          { id: '2', title: 'Product Designer', department: 'DESIGN', views: 1850, applications: 148, conversion_rate: 8.0, trend: 'up' },
+          { id: '3', title: 'Digital Marketing Lead', department: 'MARKETING', views: 3120, applications: 218, conversion_rate: 6.9, trend: 'neutral' },
+          { id: '4', title: 'Sales Executive', department: 'SALES', views: 890, applications: 42, conversion_rate: 4.7, trend: 'down' },
+        ]
+      };
+    }
+  }
+}
+
+// ============================================
+// Notification Service
+// ============================================
+
+export class NotificationService {
+  async getNotifications(): Promise<AppNotification[]> {
+    try {
+      return await rapidAPIClient.get('/notifications/');
+    } catch (error) {
+      console.warn('API getNotifications failed, using mock data');
+      return [
+        {
+          id: '1',
+          title: 'New Application',
+          message: 'Alex Smith applied for Senior Frontend Engineer',
+          type: 'success',
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
+          is_read: false,
+          category: 'application',
+          link: '/employer/applications/1'
+        },
+        {
+          id: '2',
+          title: 'New Message',
+          message: 'Sarah Chen sent you a message regarding the UI Designer role',
+          type: 'info',
+          timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
+          is_read: false,
+          category: 'message',
+          link: '/messages'
+        },
+        {
+          id: '3',
+          title: 'Status Update',
+          message: 'Your job posting for "DevOps Engineer" has been approved',
+          type: 'system',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+          is_read: true,
+          category: 'system'
+        },
+        {
+          id: '4',
+          title: 'Job Recommendation',
+          message: 'A new job matching your skills was just posted: "Senior React Developer"',
+          type: 'job',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+          is_read: false,
+          category: 'job',
+          link: '/jobs/react-99'
+        }
+      ];
+    }
+  }
+
+  async markAsRead(id: string): Promise<void> {
+    try {
+      await rapidAPIClient.put(`/notifications/${id}/read/`, {});
+    } catch (error) {
+      console.warn('API markAsRead failed');
+    }
+  }
+
+  async markAllAsRead(): Promise<void> {
+    try {
+      await rapidAPIClient.put('/notifications/mark-all-read/', {});
+    } catch (error) {
+      console.warn('API markAllAsRead failed');
     }
   }
 }
@@ -698,3 +814,5 @@ export const jobService = new JobService();
 export const applicationService = new ApplicationService();
 export const profileService = new ProfileService();
 export const companyService = new CompanyService();
+export const analyticsService = new AnalyticsService();
+export const notificationService = new NotificationService();

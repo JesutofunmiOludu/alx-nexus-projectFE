@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function CandidateSearchPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,11 +214,12 @@ export default function CandidateSearchPage() {
                     {candidate.bio}
                   </p>
 
-                  {/* Footer Buttons */}
                   <div className="mt-auto grid grid-cols-2 gap-3">
-                    <button className="w-full py-2 rounded-lg border border-gray-600 text-white text-sm font-medium hover:bg-gray-700 transition-colors">
-                      View Profile
-                    </button>
+                    <Link href={`/profile/${candidate.id}`}>
+                      <button className="w-full py-2 rounded-lg border border-gray-600 text-white text-sm font-medium hover:bg-gray-700 transition-colors">
+                        View Profile
+                      </button>
+                    </Link>
                     <button className="w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
                       Invite to Apply
                     </button>

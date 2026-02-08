@@ -221,6 +221,76 @@ export interface ApiResponse<T> {
 }
 
 // ============================================
+// Analytics Types
+// ============================================
+
+export interface AnalyticsSummary {
+  total_job_views: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  applications_received: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  conversion_rate: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  avg_time_to_hire: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+}
+
+export interface ChartDataPoint {
+  date: string;
+  views: number;
+  applications: number;
+}
+
+export interface CategoryDataPoint {
+  category: string;
+  count: number;
+}
+
+export interface TopJobPost {
+  id: string;
+  title: string;
+  department: string;
+  views: number;
+  applications: number;
+  conversion_rate: number;
+  trend: 'up' | 'down' | 'neutral';
+}
+
+export interface AnalyticsData {
+  summary: AnalyticsSummary;
+  chart_data: ChartDataPoint[];
+  category_data: CategoryDataPoint[];
+  top_jobs: TopJobPost[];
+}
+
+// ============================================
+// Notification Types
+// ============================================
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error' | 'system' | 'job';
+  timestamp: string;
+  is_read: boolean;
+  link?: string;
+  category: 'application' | 'message' | 'system' | 'job';
+}
+
+// ============================================
 // UI State Types
 // ============================================
 

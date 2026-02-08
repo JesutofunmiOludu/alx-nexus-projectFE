@@ -20,6 +20,8 @@ import {
   Users,
   CreditCard
 } from 'lucide-react';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
+import { BottomNav } from '@/components/layout/BottomNav';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -160,11 +162,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             </h1>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-white relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <NotificationDropdown />
             {user?.user_type === 'employer' ? (
               <Link
                 href="/employer/jobs/new"
@@ -186,10 +185,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-32 lg:pb-8">
           {children}
         </main>
       </div>
+
+      {/* Bottom Navigation for Mobile */}
+      <BottomNav />
     </div>
   );
 }
