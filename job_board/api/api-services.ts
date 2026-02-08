@@ -151,7 +151,8 @@ export class JobService {
         company: {
           id: 'mock-company-id',
           name: 'Mock Company',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
         location: 'Remote',
         job_type: 'full-time',
@@ -180,7 +181,8 @@ export class JobService {
         company: {
           id: 'mock-company-id',
           name: 'My Company',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         },
         location: data.location,
         job_type: data.job_type,
@@ -210,7 +212,7 @@ export class JobService {
         id: id,
         title: data.title || 'Updated Job',
         description: data.description || 'Updated Description',
-        company: { id: '1', name: 'Mock Co', created_at: '' },
+        company: { id: '1', name: 'Mock Co', created_at: '', updated_at: '' },
         location: data.location || 'Remote',
         job_type: data.job_type || 'full-time',
         experience_level: data.experience_level || 'mid',
@@ -247,7 +249,7 @@ export class JobService {
           id: 'mock-job-1',
           title: 'Senior Frontend Developer',
           description: 'Mock description',
-          company: { id: 'c1', name: 'Tech Corp', created_at: new Date().toISOString() },
+          company: { id: 'c1', name: 'Tech Corp', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
           location: 'San Francisco, CA',
           job_type: 'full-time',
           experience_level: 'senior',
@@ -316,7 +318,7 @@ export class ApplicationService {
           id: 'mock-job-1',
           title: 'Senior Frontend Developer',
           description: 'Mock Desc',
-          company: { id: 'c1', name: 'Tech Corp', created_at: '' },
+          company: { id: 'c1', name: 'Tech Corp', created_at: '', updated_at: '' },
           location: 'Remote',
           job_type: 'full-time',
           experience_level: 'senior',
@@ -335,7 +337,7 @@ export class ApplicationService {
           first_name: 'Alex',
           last_name: 'Rivera',
           user_type: 'freelancer',
-          created_at: '',
+          created_at: '', 
           updated_at: ''
         },
         cover_letter: 'I am excited to apply for this position. I have 5 years of experience with React.',
@@ -766,7 +768,8 @@ export class CompanyService {
          industry: 'Technology',
          company_size: '50-200',
          location: 'San Francisco, CA',
-         created_at: new Date().toISOString()
+         created_at: new Date().toISOString(),
+         updated_at: new Date().toISOString()
        };
     }
   }
@@ -784,8 +787,9 @@ export class CompanyService {
          website: data.website,
          industry: data.industry,
          company_size: data.company_size,
-         location: data.location,
-         created_at: new Date().toISOString()
+          location: data.location,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
        };
     }
   }
