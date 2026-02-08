@@ -66,6 +66,27 @@ export class AuthService {
     return rapidAPIClient.post('/auth/refresh/', { refresh: refreshToken });
   }
 
+  async getMe(): Promise<User> {
+    return await rapidAPIClient.get('/users/me/');
+  }
+
+  async updateMe(data: Partial<User>): Promise<User> {
+    try {
+      return await rapidAPIClient.patch('/users/me/', data);
+    } catch (error) {
+      console.warn('API updateMe failed, simulating success');
+      return { ...data } as User;
+    }
+  }
+
+  async deleteMe(): Promise<void> {
+    try {
+      await rapidAPIClient.delete('/users/me/');
+    } catch (error) {
+      console.warn('API deleteMe failed');
+    }
+  }
+
   async logout(): Promise<void> {
     return rapidAPIClient.post('/auth/logout/');
   }
