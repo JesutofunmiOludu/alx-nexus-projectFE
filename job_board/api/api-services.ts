@@ -808,7 +808,8 @@ export class CompanyService {
          industry: data.industry || 'Technology',
          company_size: data.company_size || '50-200',
          location: data.location || 'San Francisco, CA',
-         created_at: new Date().toISOString()
+         created_at: new Date().toISOString(),
+         updated_at: new Date().toISOString()
        };
     }
   }
@@ -827,7 +828,8 @@ export class CompanyService {
          industry: 'SaaS',
          company_size: '10-50',
          location: 'New York, NY',
-         created_at: new Date(Date.now() - 10000000).toISOString()
+         created_at: new Date(Date.now() - 10000000).toISOString(),
+         updated_at: new Date().toISOString()
        };
     }
   }
