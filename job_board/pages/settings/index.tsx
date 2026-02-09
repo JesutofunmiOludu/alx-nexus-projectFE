@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService } from '@/api/services';
+import { authService } from '@/api/services';
 import { useAppSelector } from '@/store';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -47,7 +47,7 @@ export default function SettingsPage() {
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ['user-me'],
-    queryFn: () => userService.getMe(),
+    queryFn: () => authService.getMe(),
   });
 
   const {
@@ -74,7 +74,7 @@ export default function SettingsPage() {
   }, [authUser, reset]);
 
   const updateMutation = useMutation({
-    mutationFn: (data: SettingsFormData) => userService.updateMe(data as any),
+    mutationFn: (data: SettingsFormData) => authService.updateMe(data as any),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-me'] });
       toast.success('Settings updated successfully');

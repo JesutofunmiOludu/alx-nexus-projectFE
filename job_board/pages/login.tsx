@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import { LoginResponse } from '@/types';
 import { Briefcase, Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 
 // Validation schema
@@ -35,7 +36,7 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
-      onSuccess: (response) => {
+      onSuccess: (response: LoginResponse) => {
         // Determine destination based on user type or returnUrl
         if (typeof returnUrl === 'string') {
           router.push(returnUrl);

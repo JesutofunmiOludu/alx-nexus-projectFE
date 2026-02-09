@@ -172,7 +172,9 @@ export default function DashboardPage() {
                       <p className="text-gray-400 text-xs mb-2">{job.company.name}</p>
                       <div className="flex flex-wrap gap-2">
                         <span className="text-[10px] bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">
-                          ${job.salary_min / 1000}k - ${job.salary_max / 1000}k
+                          {job.salary_min && job.salary_max 
+                            ? `$${job.salary_min / 1000}k - $${job.salary_max / 1000}k` 
+                            : 'Salary Competitive'}
                         </span>
                         <span className="text-[10px] bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">
                           {job.is_remote ? 'Remote' : 'On-site'}

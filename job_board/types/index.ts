@@ -34,6 +34,11 @@ export interface RegisterData {
   user_type: 'freelancer' | 'employer';
 }
 
+export interface LoginResponse {
+  tokens: AuthTokens;
+  user: User;
+}
+
 // ============================================
 // Job Types
 // ============================================
@@ -56,6 +61,7 @@ export interface Job {
   status: 'open' | 'closed' | 'draft';
   views_count: number;
   applications_count: number;
+  posted_by: string;
   created_at: string;
   updated_at: string;
 }

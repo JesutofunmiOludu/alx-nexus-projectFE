@@ -76,8 +76,11 @@ export default function ProfileEditPage() {
     setValue,
     formState: { errors, isDirty }
   } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema) as any,
     defaultValues: {
+      title: '',
+      bio: '',
+      hourly_rate: 0,
       visibility: 'public',
       skills: [],
       experience: [],

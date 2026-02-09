@@ -32,27 +32,20 @@ import toast from 'react-hot-toast';
 // --- Validation Schemas ---
 
 const jobSchema = z.object({
-  // Step 1: Job Details
   title: z.string().min(3, 'Job title is required'),
   category: z.string().min(1, 'Category is required'),
   locationType: z.enum(['remote', 'onsite', 'hybrid']),
   location: z.string().min(2, 'Location is required'),
   description: z.string().min(50, 'Description must be at least 50 characters'),
-  
-  // Step 2: Requirements
   skills: z.array(z.string()).min(1, 'At least one skill is required'),
   experienceLevel: z.string().min(1, 'Experience level is required'),
   education: z.string().min(1, 'Education level is required'),
-  questions: z.array(z.object({ text: z.string().min(1, 'Question text is required') })).optional(),
-
-  // Step 3: Compensation & Benefits
-  currency: z.string().default('USD'),
+  questions: z.array(z.object({ text: z.string().min(1, 'Question text is required') })),
+  currency: z.string().min(1),
   salaryMin: z.string().min(1, 'Minimum salary is required'),
   salaryMax: z.string().min(1, 'Maximum salary is required'),
   workSchedule: z.enum(['full-time', 'part-time', 'contract', 'freelance']),
-  benefits: z.array(z.string()).optional(),
-  
-  // Step 4: Visibility
+  benefits: z.array(z.string()),
   visibility: z.enum(['public', 'internal']),
   acceptedTerms: z.boolean().refine(val => val === true, 'You must accept the terms'),
 });
@@ -71,14 +64,20 @@ export default function PostJobPage() {
     resolver: zodResolver(jobSchema),
     mode: 'onChange',
     defaultValues: {
+      title: '',
+      category: '',
       locationType: 'remote',
+      location: '',
+      description: '',
+      skills: [],
+      experienceLevel: '',
+      education: '',
       questions: [{ text: '' }],
       currency: 'USD',
       salaryMin: '',
       salaryMax: '',
       workSchedule: 'full-time',
       benefits: [],
-      skills: [],
       visibility: 'public',
       acceptedTerms: false,
     }

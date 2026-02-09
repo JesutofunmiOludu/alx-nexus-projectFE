@@ -163,6 +163,7 @@ export class JobService {
         status: 'open',
         views_count: 100,
         applications_count: 5,
+        posted_by: 'mock-user-id',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -196,6 +197,7 @@ export class JobService {
         status: 'open',
         views_count: 0,
         applications_count: 0,
+        posted_by: 'mock-user-id',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -222,6 +224,7 @@ export class JobService {
         status: 'open',
         views_count: 0,
         applications_count: 0,
+        posted_by: 'mock-user-id',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
        };
@@ -261,6 +264,7 @@ export class JobService {
           status: 'open',
           views_count: 45,
           applications_count: 12,
+          posted_by: 'mock-user-id',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }]
@@ -328,6 +332,7 @@ export class ApplicationService {
           status: 'open',
           views_count: 100,
           applications_count: 5,
+          posted_by: 'c1',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         },
@@ -361,7 +366,7 @@ export class ApplicationService {
       console.warn('API createApplication failed, using mock data');
       return {
         id: `mock-app-${Date.now()}`,
-        job: { id: data.job_id } as Job,
+        job: { id: data.job_id, posted_by: 'mock-user-id' } as Job,
         freelancer: { id: 'mock-me', email: 'me@example.com', first_name: 'Me', last_name: 'User', user_type: 'freelancer', created_at: '', updated_at: '' },
         cover_letter: data.cover_letter,
         status: 'pending',
