@@ -30,15 +30,34 @@ export default function JobsPage() {
   const [sortBy, setSortBy] = useState('relevance');
 
   const handleSearch = () => {
-    const newParams: JobSearchParams = {
+    setSearchParams(prev => ({
+      ...prev,
       q: searchParams.q,
       location: searchParams.location,
       job_type: selectedJobTypes.length > 0 ? selectedJobTypes[0] : undefined,
+      experience_level: selectedExperience || undefined,
       is_remote: remoteOnly || undefined,
       page: 1,
-      page_size: 10,
-    };
-    setSearchParams(newParams);
+    }));
+  };
+
+  // Immediate search on filter changes
+  const onFilterChange = (updates: Partial<{
+    jobTypes: string[];
+    experience: string;
+    remote: boolean;
+  }>) => {
+    const newJobTypes = updates.jobTypes !== undefined ? updates.jobTypes : selectedJobTypes;
+    const newExp = updates.experience !== undefined ? updates.experience : selectedExperience;
+    const newRemote = updates.remote !== undefined ? updates.remote : remoteOnly;
+
+    setSearchParams(prev => ({
+      ...prev,
+      job_type: newJobTypes.length > 0 ? newJobTypes[0] : undefined,
+      experience_level: newExp || undefined,
+      is_remote: newRemote || undefined,
+      page: 1,
+    }));
   };
 
   const handleSaveJob = (jobId: string) => {
@@ -53,9 +72,11 @@ export default function JobsPage() {
   };
 
   const toggleJobType = (type: string) => {
-    setSelectedJobTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
+    const newTypes = selectedJobTypes.includes(type) 
+      ? selectedJobTypes.filter((t) => t !== type) 
+      : [...selectedJobTypes, type];
+    setSelectedJobTypes(newTypes);
+    onFilterChange({ jobTypes: newTypes });
   };
 
   const resetFilters = () => {
@@ -206,7 +227,7 @@ export default function JobsPage() {
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-gray-300 mb-3">EXPERIENCE</h3>
                 <div className="space-y-2">
-                  {[
+                  { [
                     { value: 'entry', label: 'Entry Level' },
                     { value: 'mid', label: 'Mid Level' },
                     { value: 'senior', label: 'Senior Level' },
@@ -217,7 +238,10 @@ export default function JobsPage() {
                         type="radio"
                         name="experience"
                         checked={selectedExperience === exp.value}
-                        onChange={() => setSelectedExperience(exp.value)}
+                        onChange={() => {
+                          setSelectedExperience(exp.value);
+                          onFilterChange({ experience: exp.value });
+                        }}
                         className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 focus:ring-blue-500"
                       />
                       <span className="ml-2 text-sm text-gray-300 group-hover:text-white">
@@ -236,7 +260,10 @@ export default function JobsPage() {
                     <input
                       type="checkbox"
                       checked={remoteOnly}
-                      onChange={(e) => setRemoteOnly(e.target.checked)}
+                      onChange={(e) => {
+                        setRemoteOnly(e.target.checked);
+                        onFilterChange({ remote: e.target.checked });
+                      }}
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>

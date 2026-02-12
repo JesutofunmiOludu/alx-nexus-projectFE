@@ -172,14 +172,15 @@ export default function JobDetailPage() {
               <h2 className="text-lg font-semibold text-white mb-4 border-l-4 border-blue-500 pl-3">
                 About the Role
               </h2>
-              <div className="text-gray-300 space-y-4">
-                <p>{job.description}</p>
-                <p className="text-sm">
-                  As a senior member of the team, you'll be expected to provide technical leadership, mentor
-                  junior developers, and contribute to the evolution of our frontend architecture and best
-                  practices.
-                </p>
-              </div>
+              <div 
+                className="text-gray-300 space-y-4 prose prose-invert max-w-none mb-6"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              />
+              <p className="text-gray-300 italic border-t border-gray-700 pt-4">
+                As a senior member of the team, you&apos;ll be expected to provide technical leadership, mentor
+                junior developers, and contribute to the evolution of our frontend architecture and best
+                practices.
+              </p>
             </div>
 
             {/* Responsibilities */}

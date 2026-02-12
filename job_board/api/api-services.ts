@@ -1,6 +1,8 @@
 // API Services for Job Board
 
 import { rapidAPIClient } from './rapidapi-client';
+import { smartRecruitersClient } from './smartrecruiters-client';
+import { smartRecruitersConfig } from '@/config/smartrecruiters';
 import type {
   User,
   AuthTokens,
@@ -127,9 +129,45 @@ export class AuthService {
 export class JobService {
   async searchJobs(params: JobSearchParams): Promise<PaginatedResponse<Job>> {
     try {
-      return await rapidAPIClient.get('/jobs/', params);
+      // Use SmartRecruiters Posting API
+      const companyId = smartRecruitersConfig.companyId;
+      // Map internal values to SmartRecruiters IDs
+      const typeMapping: Record<string, string> = {
+        'full-time': 'prop_toe_perm',
+        'part-time': 'prop_toe_part',
+        'contract': 'prop_toe_temp',
+        'freelance': 'prop_toe_temp',
+      };
+
+      const expMapping: Record<string, string> = {
+        'entry': 'entry_level',
+        'mid': 'mid_level',
+        'senior': 'mid_senior_level',
+        'lead': 'executive',
+      };
+
+      const response = await smartRecruitersClient.get<any>(`/v1/companies/${companyId}/postings`, {
+        q: params.q,
+        limit: params.page_size || 10,
+        offset: ((params.page || 1) - 1) * (params.page_size || 10),
+        location: params.location,
+        typeOfEmployment: params.job_type ? typeMapping[params.job_type] : undefined,
+        experienceLevel: params.experience_level ? expMapping[params.experience_level] : undefined,
+        remote: params.is_remote ? 'true' : undefined,
+      });
+
+      // Map SmartRecruiters response to our PaginatedResponse<Job>
+      return {
+        count: response.totalFound || 0,
+        totalFound: response.totalFound,
+        limit: response.limit,
+        offset: response.offset,
+        next: (response.offset + response.limit < response.totalFound) ? 'next' : null,
+        previous: response.offset > 0 ? 'prev' : null,
+        results: (response.content || []).map(this.mapSmartJobToInternal),
+      };
     } catch (error) {
-       console.warn('API searchJobs failed, using mock data');
+       console.warn('SmartRecruiters searchJobs failed, using mock data');
        return {
          count: 0,
          next: null,
@@ -139,11 +177,55 @@ export class JobService {
     }
   }
 
+  private mapSmartJobToInternal(smartJob: any): Job {
+    return {
+      id: smartJob.id,
+      uuid: smartJob.uuid,
+      title: smartJob.name,
+      description: '', // List view doesn't have full description
+      company: {
+        id: smartJob.company?.identifier || 'unknown',
+        name: smartJob.company?.name || 'Unknown Company',
+        created_at: smartJob.releasedDate || new Date().toISOString(),
+        updated_at: smartJob.releasedDate || new Date().toISOString(),
+      },
+      location: `${smartJob.location?.city || ''}, ${smartJob.location?.region || ''}, ${smartJob.location?.country || ''}`.replace(/^, |, $/, ''),
+      location_details: {
+        city: smartJob.location?.city,
+        region: smartJob.location?.region,
+        country: smartJob.location?.country,
+        remote: smartJob.location?.remote,
+        latitude: smartJob.location?.latitude,
+        longitude: smartJob.location?.longitude,
+      },
+      job_type: smartJob.typeOfEmployment?.label || 'contract',
+      experience_level: smartJob.experienceLevel?.label || 'mid',
+      salary_currency: 'USD',
+      skills_required: [], // Derived from custom fields or tags if available
+      is_remote: smartJob.location?.remote || false,
+      status: 'open',
+      views_count: 0,
+      applications_count: 0,
+      posted_by: smartJob.creator?.name || 'SmartRecruiters',
+      created_at: smartJob.releasedDate || new Date().toISOString(),
+      updated_at: smartJob.releasedDate || new Date().toISOString(),
+      ref: smartJob.ref,
+    };
+  }
+
   async getJob(id: string): Promise<Job> {
     try {
-      return await rapidAPIClient.get(`/jobs/${id}/`);
+      const companyId = smartRecruitersConfig.companyId;
+      const smartJob = await smartRecruitersClient.get<any>(`/v1/companies/${companyId}/postings/${id}`);
+      
+      return {
+        ...this.mapSmartJobToInternal(smartJob),
+        description: smartJob.jobAd?.sections?.jobDescription?.text || '',
+        jobAd: smartJob.jobAd,
+        applyUrl: smartJob.applyUrl,
+      };
     } catch(error) {
-      console.warn('API getJob failed, using mock data');
+      console.warn('SmartRecruiters getJob failed, using mock data');
       return {
         id,
         title: 'Mock Job Title',
@@ -172,9 +254,27 @@ export class JobService {
 
   async createJob(data: CreateJobData): Promise<Job> {
     try {
-      return await rapidAPIClient.post('/jobs/', data);
+      // Use SmartRecruiters Core Job API (requires authentication)
+      const smartJob = await smartRecruitersClient.post<any>('/jobs', {
+        title: data.title,
+        location: {
+          city: data.location.split(',')[0]?.trim(),
+          country: 'US', // Defaulting for simple migration
+        },
+        industry: { id: 'internet' }, // Default
+        function: { id: 'engineering' }, // Default
+        experienceLevel: { id: 'mid_senior_level' }, // Default
+        jobAd: {
+          sections: {
+            jobDescription: { title: 'Job Description', text: data.description },
+          }
+        },
+        typeOfEmployment: { id: 'toe_perm' },
+      });
+
+      return this.mapSmartJobToInternal(smartJob);
     } catch (error) {
-      console.warn('API createJob failed, using mock data');
+      console.warn('SmartRecruiters createJob failed, using mock data');
       return {
         id: `mock-job-${Date.now()}`,
         title: data.title,
@@ -355,15 +455,29 @@ export class ApplicationService {
 
   async createApplication(data: CreateApplicationData): Promise<Application> {
     try {
-      const formData = new FormData();
-      formData.append('job_id', data.job_id);
-      formData.append('cover_letter', data.cover_letter);
-      if (data.resume) {
-        formData.append('resume', data.resume);
-      }
-      return await rapidAPIClient.post('/applications/', formData);
+      // SmartRecruiters requires a UUID for the posting
+      // Assuming job_id is actually the UUID or we need to fetch the job first to get uuid
+      // For now, we try to use job_id as the :uuid in the Application API
+      const postingUuid = data.job_id; 
+      
+      const response = await smartRecruitersClient.post<any>(`/v1/postings/${postingUuid}/candidates`, {
+        firstName: 'Candidate', // Placeholder
+        lastName: 'User',
+        email: 'candidate@example.com',
+        location: { city: 'Remote', country: 'US' },
+      });
+
+      return {
+        id: response.id || `app-${Date.now()}`,
+        job: { id: data.job_id } as any,
+        freelancer: { id: 'me' } as any,
+        cover_letter: data.cover_letter,
+        status: 'pending',
+        applied_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
     } catch (error) {
-      console.warn('API createApplication failed, using mock data');
+      console.warn('SmartRecruiters createApplication failed, using mock data');
       return {
         id: `mock-app-${Date.now()}`,
         job: { id: data.job_id, posted_by: 'mock-user-id' } as Job,

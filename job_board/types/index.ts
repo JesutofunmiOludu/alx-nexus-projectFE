@@ -43,14 +43,24 @@ export interface LoginResponse {
 // Job Types
 // ============================================
 
+// Core Job interface (Unified model)
 export interface Job {
   id: string;
+  uuid?: string;
   title: string;
   description: string;
   company: Company;
   location: string;
-  job_type: 'full-time' | 'part-time' | 'contract' | 'freelance';
-  experience_level: 'entry' | 'mid' | 'senior' | 'lead';
+  location_details?: {
+    city?: string;
+    region?: string;
+    country?: string;
+    remote?: boolean;
+    latitude?: string;
+    longitude?: string;
+  };
+  job_type: 'full-time' | 'part-time' | 'contract' | 'freelance' | string;
+  experience_level: 'entry' | 'mid' | 'senior' | 'lead' | string;
   salary_min?: number;
   salary_max?: number;
   salary_currency: string;
@@ -58,12 +68,23 @@ export interface Job {
   benefits?: string[];
   application_deadline?: string;
   is_remote: boolean;
-  status: 'open' | 'closed' | 'draft';
+  status: 'open' | 'closed' | 'draft' | string;
   views_count: number;
   applications_count: number;
   posted_by: string;
   created_at: string;
   updated_at: string;
+  // SmartRecruiters specific
+  ref?: string;
+  applyUrl?: string;
+  jobAd?: {
+    sections: {
+      companyDescription?: { title: string; text: string };
+      jobDescription?: { title: string; text: string };
+      qualifications?: { title: string; text: string };
+      additionalInformation?: { title: string; text: string };
+    };
+  };
 }
 
 export interface CreateJobData {
@@ -99,6 +120,7 @@ export interface JobSearchParams {
 
 export interface Company {
   id: string;
+  identifier?: string;
   name: string;
   description?: string;
   logo?: string;
@@ -206,9 +228,13 @@ export interface Certification {
 
 export interface PaginatedResponse<T> {
   count: number;
+  totalFound?: number; // SmartRecruiters uses this
+  limit?: number;
+  offset?: number;
   next: string | null;
   previous: string | null;
   results: T[];
+  content?: T[]; // SmartRecruiters uses this
 }
 
 // ============================================

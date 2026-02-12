@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import { MapPin, Briefcase, DollarSign, Clock, Bookmark } from 'lucide-react';
 import Link from 'next/link';
+import { stripHtml } from '@/lib/utils';
 
 interface JobCardProps {
   job: Job;
@@ -53,7 +54,7 @@ export function JobCard({ job, onSave, isSaved = false }: JobCardProps) {
 
         <CardContent>
           <p className="text-gray-700 text-sm line-clamp-2 mb-4">
-            {job.description}
+            {stripHtml(job.description)}
           </p>
 
           <div className="flex flex-wrap gap-2 mb-4">
